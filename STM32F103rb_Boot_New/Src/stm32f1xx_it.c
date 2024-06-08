@@ -204,7 +204,7 @@ void DMA1_Channel6_IRQHandler( void ) {
 void USART2_IRQHandler( void ) {
     /* USER CODE BEGIN USART2_IRQn 0 */
     uint32_t temp;
-    if ( ( __HAL_UART_GET_FLAG( &huart2, UART_FLAG_IDLE ) != RESET ) ) {
+    if ( ( __HAL_UART_GET_FLAG( &huart2, UART_FLAG_IDLE ) != RESET ) ) {  // 空闲中断
         /*清除状态寄存器和串口数据寄存器*/
         __HAL_UART_CLEAR_IDLEFLAG( &huart2 );
 

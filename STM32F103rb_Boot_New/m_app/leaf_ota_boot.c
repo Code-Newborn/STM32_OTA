@@ -175,11 +175,11 @@ void Leaf_Deal_Frame( unsigned char* buf, int len ) {
     for ( int i = 0; i < ( len - 1 ); i++ ) {
         sum += buf[ i ];
     }
-    if ( sum != buf[ len - 1 ] )
+    if ( sum != buf[ len - 1 ] )  // 和校验不通过
         return;
 
 
-    if ( len == 10 )  // 开始 ("START")+(4字节地址)+(1字节校验) = 10
+    if ( len == 10 )  // 开始 (4字节 "START") + (4字节 地址) + (1字节 和校验) = 10
     {
         if ( buf[ 0 ] != 'S' )
             return;
@@ -194,12 +194,12 @@ void Leaf_Deal_Frame( unsigned char* buf, int len ) {
 
         // 文件大小
         file_size = ( buf[ 5 ] << 24 ) + ( buf[ 6 ] << 16 ) + ( buf[ 7 ] << 8 ) + ( buf[ 8 ] );
-        if ( file_size > Application_Size )
+        if ( file_size > Application_Size )  // 程序地址超过程序预分配大小
             return;
 
-        // 擦除
+        // 整页擦除
         Erase_page( Application_1_Addr, Application_Size / PageSize );
-        Read_Flag = 1;
+        Read_Flag = 1;  // 已读到升级程序
         printf( "\n> Status:%d\r\n> Ready to receive file\r\n", file_size );
     }
     else if ( len == 4 )  // 结束 ("END")+(1字节校验) = 4
@@ -216,7 +216,7 @@ void Leaf_Deal_Frame( unsigned char* buf, int len ) {
         printf( "> File fail!, restart...\r\n" );
         HAL_NVIC_SystemReset();
     }
-    else if ( len == ( 138 ) )  // 数据文件 ("DATA")+(4字节地址)+(1字节大小)+(128字节数据)+(1字节校验) = 137
+    else if ( len == ( 138 ) )  // 接收数据文件 ("DATA")+(4字节地址)+(1字节大小)+(128字节数据)+(1字节校验) = 137
     {
         if ( buf[ 0 ] != 'D' )
             return;
@@ -228,10 +228,10 @@ void Leaf_Deal_Frame( unsigned char* buf, int len ) {
             return;
 
         unsigned int addr = ( buf[ 4 ] << 24 ) + ( buf[ 5 ] << 16 ) + ( buf[ 6 ] << 8 ) + ( buf[ 7 ] );
-        if ( addr_now != addr )
+        if ( addr_now != addr )  // 地址写入错误
             return;
 
-        if ( buf[ 8 ] != 128 )
+        if ( buf[ 8 ] != 128 )  // 数据量大小
             return;
 
         /* 数据正确:烧录 */
@@ -364,7 +364,7 @@ void Start_BootLoader( void ) {
     }
     default:  ///< 启动失败
     {
-        printf( "> Error:%X!!!......\r\n", Read_Start_Mode() );
+        printf( "> Error:%X!!!......\r\n", Read_Start_Mode() );  // 当前启动模式
         return;
     }
     }

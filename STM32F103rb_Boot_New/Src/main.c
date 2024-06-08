@@ -105,8 +105,8 @@ int main( void ) {
     MX_USART1_UART_Init();
     MX_USART2_UART_Init();
     /* USER CODE BEGIN 2 */
-    HAL_UART_Receive_DMA( &huart2, Rx_Buf, Rx_Max );
-    __HAL_UART_ENABLE_IT( &huart2, UART_IT_IDLE );
+    HAL_UART_Receive_DMA( &huart2, Rx_Buf, Rx_Max );  // 串口2接收数据
+    __HAL_UART_ENABLE_IT( &huart2, UART_IT_IDLE );    // 打开空闲中断
     /* USER CODE END 2 */
 
     /* Infinite loop */
@@ -116,8 +116,7 @@ int main( void ) {
 
         /* USER CODE BEGIN 3 */
 
-        /* ¿ªÊ¼ */
-        Start_BootLoader();
+        Start_BootLoader();  // 进入Bootloader
     }
     /* USER CODE END 3 */
 }
