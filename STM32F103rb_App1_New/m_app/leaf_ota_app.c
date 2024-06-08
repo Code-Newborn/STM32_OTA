@@ -3,145 +3,133 @@
 #include "stdio.h"
 
 
-
 /*======================================================================*/
-/*=========================Flash»ù±¾º¯Êı(start)=========================*/
+/*=========================FlashåŸºæœ¬å‡½æ•°(start)=========================*/
 /*======================================================================*/
 /**
- * @bieaf ²Á³ıÒ³
+ * @bieaf æ“¦é™¤é¡µ
  *
- * @param pageaddr  Ò³ÆğÊ¼µØÖ·	
- * @param num       ²Á³ıµÄÒ³Êı
+ * @param pageaddr  é¡µèµ·å§‹åœ°å€
+ * @param num       æ“¦é™¤çš„é¡µæ•°
  * @return 1
  */
-static int Erase_page(uint32_t pageaddr, uint32_t num)
-{
-	HAL_FLASH_Unlock();
-	
-	/* ²Á³ıFLASH*/
-	FLASH_EraseInitTypeDef FlashSet;
-	FlashSet.TypeErase = FLASH_TYPEERASE_PAGES;
-	FlashSet.PageAddress = pageaddr;
-	FlashSet.NbPages = num;
-	
-	/*ÉèÖÃPageError£¬µ÷ÓÃ²Á³ıº¯Êı*/
-	uint32_t PageError = 0;
-	HAL_FLASHEx_Erase(&FlashSet, &PageError);
-	
-	HAL_FLASH_Lock();
-	return 1;
-}
+static int Erase_page( uint32_t pageaddr, uint32_t num ) {
+    HAL_FLASH_Unlock();
 
+    /* æ“¦é™¤FLASH*/
+    FLASH_EraseInitTypeDef FlashSet;
+    FlashSet.TypeErase   = FLASH_TYPEERASE_PAGES;
+    FlashSet.PageAddress = pageaddr;
+    FlashSet.NbPages     = num;
+
+    /*è®¾ç½®PageErrorï¼Œè°ƒç”¨æ“¦é™¤å‡½æ•°*/
+    uint32_t PageError = 0;
+    HAL_FLASHEx_Erase( &FlashSet, &PageError );
+
+    HAL_FLASH_Lock();
+    return 1;
+}
 
 
 /**
- * @bieaf Ğ´Èô¸É¸öÊı¾İ
+ * @bieaf å†™è‹¥å¹²ä¸ªæ•°æ®
  *
- * @param addr       Ğ´ÈëµÄµØÖ·
- * @param buff       Ğ´ÈëÊı¾İµÄÊı×éÖ¸Õë
- * @param word_size  ³¤¶È
+ * @param addr       å†™å…¥çš„åœ°å€
+ * @param buff       å†™å…¥æ•°æ®çš„æ•°ç»„æŒ‡é’ˆ
+ * @param word_size  é•¿åº¦
  */
-static void WriteFlash(uint32_t addr, uint32_t * buff, int word_size)
-{	
-	/* 1/4½âËøFLASH*/
-	HAL_FLASH_Unlock();
-	
-	for(int i = 0; i < word_size; i++)	
-	{
-		/* 3/4¶ÔFLASHÉÕĞ´*/
-		HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, addr + 4 * i, buff[i]);	
-	}
+static void WriteFlash( uint32_t addr, uint32_t* buff, int word_size ) {
+    /* 1/4è§£é”FLASH*/
+    HAL_FLASH_Unlock();
 
-	/* 4/4Ëø×¡FLASH*/
-	HAL_FLASH_Lock();
+    for ( int i = 0; i < word_size; i++ ) {
+        /* 3/4å¯¹FLASHçƒ§å†™*/
+        HAL_FLASH_Program( FLASH_TYPEPROGRAM_WORD, addr + 4 * i, buff[ i ] );
+    }
+
+    /* 4/4é”ä½FLASH*/
+    HAL_FLASH_Lock();
 }
-
 
 
 /**
- * @bieaf ¶ÁÈô¸É¸öÊı¾İ
+ * @bieaf è¯»è‹¥å¹²ä¸ªæ•°æ®
  *
- * @param addr       ¶ÁÊı¾İµÄµØÖ·
- * @param buff       ¶Á³öÊı¾İµÄÊı×éÖ¸Õë
- * @param word_size  ³¤¶È
+ * @param addr       è¯»æ•°æ®çš„åœ°å€
+ * @param buff       è¯»å‡ºæ•°æ®çš„æ•°ç»„æŒ‡é’ˆ
+ * @param word_size  é•¿åº¦
  */
-static void ReadFlash(unsigned int addr, unsigned int * buff, uint16_t word_size)
-{
-	for(int i =0; i < word_size; i++)
-	{
-		buff[i] = *(__IO unsigned int*)(addr + 4 * i);
-	}
-	return;
+static void ReadFlash( unsigned int addr, unsigned int* buff, uint16_t word_size ) {
+    for ( int i = 0; i < word_size; i++ ) {
+        buff[ i ] = *( __IO unsigned int* )( addr + 4 * i );
+    }
+    return;
 }
 /*====================================================================*/
-/*=========================Flash»ù±¾º¯Êı(end)=========================*/
+/*=========================FlashåŸºæœ¬å‡½æ•°(end)=========================*/
 /*====================================================================*/
 
 
-/* ĞŞ¸ÄÆô¶¯Ä£Ê½ */
-void Set_Start_Mode(unsigned int Mode)
-{
-	// ²Á³ı1Ò³->Ğ´Êı¾İ
-	Erase_page((Application_1_Addr - PageSize), 1);
-	WriteFlash((Application_1_Addr - 4), &Mode, 1);
+/* ä¿®æ”¹å¯åŠ¨æ¨¡å¼ */
+void Set_Start_Mode( unsigned int Mode ) {
+    // æ“¦é™¤1é¡µ->å†™æ•°æ®
+    Erase_page( ( Application_1_Addr - PageSize ), 1 );
+    WriteFlash( ( Application_1_Addr - 4 ), &Mode, 1 );
 }
 
 
-static unsigned int file_size = 0;		//ÎÄ¼ş´óĞ¡
+static unsigned int file_size = 0;  // æ–‡ä»¶å¤§å°
 
 
-
-/* ´®¿Ú2·¢ËÍÊı¾İ */
-void Leaf_Uart2_Send(unsigned char * buf, int len)
-{
-	HAL_UART_Transmit(&huart2, (uint8_t *)buf, len, 0xFFFF);
-	HAL_Delay(5);
+/* ä¸²å£2å‘é€æ•°æ® */
+void Leaf_Uart2_Send( unsigned char* buf, int len ) {
+    HAL_UART_Transmit( &huart2, ( uint8_t* )buf, len, 0xFFFF );
+    HAL_Delay( 5 );
 }
 
 
+/*æ•°æ®å¤„ç†å‡½æ•° */
+void Leaf_Deal_Frame( unsigned char* buf, int len ) {
+    /* æ ¡éªŒ */
+    unsigned char sum = 0;
+    for ( int i = 0; i < ( len - 1 ); i++ ) {
+        sum += buf[ i ];
+    }
+    if ( sum != buf[ len - 1 ] )
+        return;
 
-/*Êı¾İ´¦Àíº¯Êı */
-void Leaf_Deal_Frame(unsigned char * buf, int len)
-{
-	/* Ğ£Ñé */
-	unsigned char sum = 0;
-	for(int i = 0;i<(len-1);i++)
-	{
-		sum += buf[i];
-	}
-	if(sum != buf[len-1]) return;
-	
-	
-	if(len == 10)//¿ªÊ¼ ("START")+(4×Ö½ÚµØÖ·)+(1×Ö½ÚĞ£Ñé) = 10
-	{
-		if(buf[0]!='S') return;
-		if(buf[1]!='T') return;
-		if(buf[2]!='A') return;
-		if(buf[3]!='R') return;
-		if(buf[4]!='T') return;
-		
-		//ÎÄ¼ş´óĞ¡
-		file_size = (buf[5]<<24) + (buf[6]<<16) + (buf[7]<<8) + (buf[8]);
-		if(file_size>Application_Size) return;
-		
-		//ĞŞ¸Ä±êÖ¾Î»
-		Set_Start_Mode(Startup_Normol);
-		printf("> File ok!, restart...\r\n");
-		HAL_NVIC_SystemReset();
-	}
+
+    if ( len == 10 )  // å¼€å§‹ ("START")+(4å­—èŠ‚åœ°å€)+(1å­—èŠ‚æ ¡éªŒ) = 10
+    {
+        if ( buf[ 0 ] != 'S' )
+            return;
+        if ( buf[ 1 ] != 'T' )
+            return;
+        if ( buf[ 2 ] != 'A' )
+            return;
+        if ( buf[ 3 ] != 'R' )
+            return;
+        if ( buf[ 4 ] != 'T' )
+            return;
+
+        // æ–‡ä»¶å¤§å°
+        file_size = ( buf[ 5 ] << 24 ) + ( buf[ 6 ] << 16 ) + ( buf[ 7 ] << 8 ) + ( buf[ 8 ] );
+        if ( file_size > Application_Size )
+            return;
+
+        // ä¿®æ”¹æ ‡å¿—ä½
+        Set_Start_Mode( Startup_Normol );
+        printf( "> File ok!, restart...\r\n" );
+        HAL_NVIC_SystemReset();
+    }
 }
 
 
-
-/* appÉı¼¶º¯Êı */
-void leaf_ota_app(void)
-{
-	if(Rx_Flag == 1)    	// ÊÕµ½Ò»Ö¡Êı¾İ
-	{
-		Rx_Flag = 0;
-		Leaf_Deal_Frame(Rx_Buf, Rx_Len);
-	}
+/* appå‡çº§å‡½æ•° */
+void leaf_ota_app( void ) {
+    if ( Rx_Flag == 1 )  // æ”¶åˆ°ä¸€å¸§æ•°æ®
+    {
+        Rx_Flag = 0;
+        Leaf_Deal_Frame( Rx_Buf, Rx_Len );
+    }
 }
-
-
-

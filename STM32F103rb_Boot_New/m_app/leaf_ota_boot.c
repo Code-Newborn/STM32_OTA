@@ -3,401 +3,373 @@
 #include "stdio.h"
 
 
-
-
 /*======================================================================*/
-/*=========================Flash»ù±¾º¯Êı(start)=========================*/
+/*=========================FlashåŸºæœ¬å‡½æ•°(start)=========================*/
 /*======================================================================*/
 /**
- * @bieaf ²Á³ıÒ³
+ * @bieaf æ“¦é™¤é¡µ
  *
- * @param pageaddr  ÆğÊ¼µØÖ·	
- * @param num       ²Á³ıµÄÒ³Êı
+ * @param pageaddr  èµ·å§‹åœ°å€
+ * @param num       æ“¦é™¤çš„é¡µæ•°
  * @return 1
  */
-static int Erase_page(unsigned int pageaddr, unsigned int num)
-{
-	HAL_FLASH_Unlock();
-	
-	/* ²Á³ıFLASH*/
-	FLASH_EraseInitTypeDef FlashSet;
-	FlashSet.TypeErase = FLASH_TYPEERASE_PAGES;
-	FlashSet.PageAddress = pageaddr;
-	FlashSet.NbPages = num;
-	
-	/*ÉèÖÃPageError, µ÷ÓÃ²Á³ıº¯Êı*/
-	unsigned int PageError = 0;
-	HAL_FLASHEx_Erase(&FlashSet, &PageError);
-	
-	HAL_FLASH_Lock();
-	return 1;
+static int Erase_page( unsigned int pageaddr, unsigned int num ) {
+    HAL_FLASH_Unlock();
+
+    /* æ“¦é™¤FLASH*/
+    FLASH_EraseInitTypeDef FlashSet;
+    FlashSet.TypeErase   = FLASH_TYPEERASE_PAGES;
+    FlashSet.PageAddress = pageaddr;
+    FlashSet.NbPages     = num;
+
+    /*è®¾ç½®PageError, è°ƒç”¨æ“¦é™¤å‡½æ•°*/
+    unsigned int PageError = 0;
+    HAL_FLASHEx_Erase( &FlashSet, &PageError );
+
+    HAL_FLASH_Lock();
+    return 1;
 }
 
 
 /**
- * @bieaf Ğ´Èô¸É¸öÊı¾İ
+ * @bieaf å†™è‹¥å¹²ä¸ªæ•°æ®
  *
- * @param addr       Ğ´ÈëµÄµØÖ·
- * @param buff       Ğ´ÈëÊı¾İµÄÆğÊ¼µØÖ·
- * @param word_size  ³¤¶È
+ * @param addr       å†™å…¥çš„åœ°å€
+ * @param buff       å†™å…¥æ•°æ®çš„èµ·å§‹åœ°å€
+ * @param word_size  é•¿åº¦
  */
-static void WriteFlash(unsigned int addr, unsigned int * buff, int word_size)
-{	
-	/* 1/4½âËøFLASH*/
-	HAL_FLASH_Unlock();
-	
-	for(int i = 0; i < word_size; i++)	
-	{
-		/* 3/4¶ÔFLASHÉÕĞ´*/
-		HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, addr + 4 * i, buff[i]);	
-	}
+static void WriteFlash( unsigned int addr, unsigned int* buff, int word_size ) {
+    /* 1/4è§£é”FLASH*/
+    HAL_FLASH_Unlock();
 
-	/* 4/4Ëø×¡FLASH*/
-	HAL_FLASH_Lock();
+    for ( int i = 0; i < word_size; i++ ) {
+        /* 3/4å¯¹FLASHçƒ§å†™*/
+        HAL_FLASH_Program( FLASH_TYPEPROGRAM_WORD, addr + 4 * i, buff[ i ] );
+    }
+
+    /* 4/4é”ä½FLASH*/
+    HAL_FLASH_Lock();
 }
 
 
-
 /**
- * @bieaf ¶ÁÈô¸É¸öÊı¾İ
+ * @bieaf è¯»è‹¥å¹²ä¸ªæ•°æ®
  *
- * @param addr       ¶ÁÊı¾İµÄµØÖ·
- * @param buff       ¶Á³öÊı¾İµÄÊı×éÖ¸Õë
- * @param word_size  ³¤¶È
+ * @param addr       è¯»æ•°æ®çš„åœ°å€
+ * @param buff       è¯»å‡ºæ•°æ®çš„æ•°ç»„æŒ‡é’ˆ
+ * @param word_size  é•¿åº¦
  */
-static void ReadFlash(unsigned int addr, unsigned int * buff, uint16_t word_size)
-{
-	for(int i =0; i < word_size; i++)
-	{
-		buff[i] = *(__IO unsigned int*)(addr + 4 * i);
-	}
-	return;
+static void ReadFlash( unsigned int addr, unsigned int* buff, uint16_t word_size ) {
+    for ( int i = 0; i < word_size; i++ ) {
+        buff[ i ] = *( __IO unsigned int* )( addr + 4 * i );
+    }
+    return;
 }
 /*====================================================================*/
-/*=========================Flash»ù±¾º¯Êı(end)=========================*/
+/*=========================FlashåŸºæœ¬å‡½æ•°(end)=========================*/
 /*====================================================================*/
 
 /**
- * @bieaf ½øĞĞ³ÌĞòµÄ¸²¸Ç
+ * @bieaf è¿›è¡Œç¨‹åºçš„è¦†ç›–
  *
- * @param  °áÔËµÄÔ´µØÖ·
- * @param  °áÔËµÄÄ¿µÄµØÖ·
- * @return °áÔËµÄ³ÌĞò´óĞ¡
+ * @param  æ¬è¿çš„æºåœ°å€
+ * @param  æ¬è¿çš„ç›®çš„åœ°å€
+ * @return æ¬è¿çš„ç¨‹åºå¤§å°
  */
-void MoveCode(unsigned int src_addr, unsigned int des_addr, unsigned int byte_size)
-{
-	/*1.²Á³ıÄ¿µÄµØÖ·*/
-	printf("> Start erase des flash......\r\n");
-	Erase_page(des_addr, (byte_size/PageSize));
-	printf("> Erase des flash down......\r\n");
-	
-	/*2.¿ªÊ¼¿½±´*/	
-	unsigned int temp[256];
-	
-	printf("> Start copy......\r\n");
-	for(int i = 0; i < byte_size/1024; i++)
-	{
-		ReadFlash((src_addr + i*1024), temp, 256);
-		WriteFlash((des_addr + i*1024), temp, 256);
-	}
-	printf("> Copy down......\r\n");
-	
-	/*3.²Á³ıÔ´µØÖ·*/
-	printf("> Start erase src flash......\r\n");
-	Erase_page(src_addr, (byte_size/PageSize));
-	printf("> Erase src flash down......\r\n");
+void MoveCode( unsigned int src_addr, unsigned int des_addr, unsigned int byte_size ) {
+    /*1.æ“¦é™¤ç›®çš„åœ°å€*/
+    printf( "> Start erase des flash......\r\n" );
+    Erase_page( des_addr, ( byte_size / PageSize ) );
+    printf( "> Erase des flash down......\r\n" );
+
+    /*2.å¼€å§‹æ‹·è´*/
+    unsigned int temp[ 256 ];
+
+    printf( "> Start copy......\r\n" );
+    for ( int i = 0; i < byte_size / 1024; i++ ) {
+        ReadFlash( ( src_addr + i * 1024 ), temp, 256 );
+        WriteFlash( ( des_addr + i * 1024 ), temp, 256 );
+    }
+    printf( "> Copy down......\r\n" );
+
+    /*3.æ“¦é™¤æºåœ°å€*/
+    printf( "> Start erase src flash......\r\n" );
+    Erase_page( src_addr, ( byte_size / PageSize ) );
+    printf( "> Erase src flash down......\r\n" );
 }
 
 
-
-/* ĞŞ¸ÄÆô¶¯Ä£Ê½ */
-void Set_Start_Mode(unsigned int Mode)
-{ 
-	//²Á³ıÒ»Ò³ - Ğ´Êı¾İ
-	Erase_page((Application_1_Addr - PageSize), 1);
-	WriteFlash((Application_1_Addr - 4), &Mode, 1);
+/* ä¿®æ”¹å¯åŠ¨æ¨¡å¼ */
+void Set_Start_Mode( unsigned int Mode ) {
+    // æ“¦é™¤ä¸€é¡µ - å†™æ•°æ®
+    Erase_page( ( Application_1_Addr - PageSize ), 1 );
+    WriteFlash( ( Application_1_Addr - 4 ), &Mode, 1 );
 }
 
 
-
-/* ¶ÁÈ¡Æô¶¯Ä£Ê½ */
-unsigned int Read_Start_Mode(void)
-{
-	unsigned int mode = 0;
-	ReadFlash((Application_1_Addr - 4), &mode, 1);
-	return mode;
+/* è¯»å–å¯åŠ¨æ¨¡å¼ */
+unsigned int Read_Start_Mode( void ) {
+    unsigned int mode = 0;
+    ReadFlash( ( Application_1_Addr - 4 ), &mode, 1 );
+    return mode;
 }
 
 
+static unsigned int file_size = 0;  // æ–‡ä»¶å¤§å°
+static unsigned int addr_now  = 0;  // binæ–‡ä»¶ä½ç½®
 
-static unsigned int file_size = 0;		//ÎÄ¼ş´óĞ¡
-static unsigned int addr_now = 0;		//binÎÄ¼şÎ»ÖÃ
-
-static int Read_Flag = 0 ;				//Éı¼¶×¼±¸¾ÍĞ÷±êÖ¾Î»
-static unsigned int Waite_time = 0 ;	//×Ô¼ìÊ±¼ä
-
+static int          Read_Flag  = 0;  // å‡çº§å‡†å¤‡å°±ç»ªæ ‡å¿—ä½
+static unsigned int Waite_time = 0;  // è‡ªæ£€æ—¶é—´
 
 
-/* ´®¿Ú2·¢ËÍÊı¾İ */
-void Leaf_Uart2_Send(unsigned char * buf, int len)
-{
-	HAL_UART_Transmit(&huart2, (uint8_t *)buf, len, 0xFFFF);
-	HAL_Delay(5);
+/* ä¸²å£2å‘é€æ•°æ® */
+void Leaf_Uart2_Send( unsigned char* buf, int len ) {
+    HAL_UART_Transmit( &huart2, ( uint8_t* )buf, len, 0xFFFF );
+    HAL_Delay( 5 );
 }
-
 
 
 /**
- * @bieaf ÇëÇóÎÄ¼şÊı¾İ
+ * @bieaf è¯·æ±‚æ–‡ä»¶æ•°æ®
  *
- * @param ÇëÇóµÄµØÖ·
- * @param ÇëÇóµÄ´óĞ¡
+ * @param è¯·æ±‚çš„åœ°å€
+ * @param è¯·æ±‚çš„å¤§å°
  */
-void Get_File(unsigned int addr, int size)
-{
-	static unsigned char tmp_t[10];
-	tmp_t[0] = 'D';
-	tmp_t[1] = 'A';
-	tmp_t[2] = 'T';
-	tmp_t[3] = 'A';
-	tmp_t[4] = (addr>>24)&0xFF;
-	tmp_t[5] = (addr>>16)&0xFF;
-	tmp_t[6] = (addr>>8)&0xFF;
-	tmp_t[7] = (addr)&0xFF;
-	tmp_t[8] = size;
-	
-	/* ¼ÆËãĞ£ÑéºÍ */	
-	tmp_t[9] = tmp_t[0] + tmp_t[1] + tmp_t[2] + tmp_t[3] + tmp_t[4] + tmp_t[5] + tmp_t[6] + tmp_t[7] + tmp_t[8];
-	Leaf_Uart2_Send(tmp_t, 10);
-}
+void Get_File( unsigned int addr, int size ) {
+    static unsigned char tmp_t[ 10 ];
+    tmp_t[ 0 ] = 'D';
+    tmp_t[ 1 ] = 'A';
+    tmp_t[ 2 ] = 'T';
+    tmp_t[ 3 ] = 'A';
+    tmp_t[ 4 ] = ( addr >> 24 ) & 0xFF;
+    tmp_t[ 5 ] = ( addr >> 16 ) & 0xFF;
+    tmp_t[ 6 ] = ( addr >> 8 ) & 0xFF;
+    tmp_t[ 7 ] = ( addr ) & 0xFF;
+    tmp_t[ 8 ] = size;
 
+    /* è®¡ç®—æ ¡éªŒå’Œ */
+    tmp_t[ 9 ] = tmp_t[ 0 ] + tmp_t[ 1 ] + tmp_t[ 2 ] + tmp_t[ 3 ] + tmp_t[ 4 ] + tmp_t[ 5 ] + tmp_t[ 6 ] + tmp_t[ 7 ] + tmp_t[ 8 ];
+    Leaf_Uart2_Send( tmp_t, 10 );
+}
 
 
 /**
- * @bieaf »Ø¸´ÏÂÔØ³É¹¦
+ * @bieaf å›å¤ä¸‹è½½æˆåŠŸ
  *
  */
-void Get_File_Ok()
-{
-	static unsigned char tmp_t[3];
-	tmp_t[0] = 'O';
-	tmp_t[1] = 'K';
-	
-	/* ¼ÆËãĞ£ÑéºÍ */
-	tmp_t[2] = tmp_t[0] + tmp_t[1];
-	Leaf_Uart2_Send(tmp_t, 3);
+void Get_File_Ok() {
+    static unsigned char tmp_t[ 3 ];
+    tmp_t[ 0 ] = 'O';
+    tmp_t[ 1 ] = 'K';
+
+    /* è®¡ç®—æ ¡éªŒå’Œ */
+    tmp_t[ 2 ] = tmp_t[ 0 ] + tmp_t[ 1 ];
+    Leaf_Uart2_Send( tmp_t, 3 );
 }
 
 
+/* æ•°æ®å¤„ç†å‡½æ•° */
+void Leaf_Deal_Frame( unsigned char* buf, int len ) {
+    /* æ ¡éªŒ */
+    unsigned char sum = 0;
+    for ( int i = 0; i < ( len - 1 ); i++ ) {
+        sum += buf[ i ];
+    }
+    if ( sum != buf[ len - 1 ] )
+        return;
 
-/* Êı¾İ´¦Àíº¯Êı */
-void Leaf_Deal_Frame(unsigned char * buf, int len)
-{
-	/* Ğ£Ñé */
-	unsigned char sum = 0;
-	for(int i = 0;i<(len-1);i++)
-	{
-		sum += buf[i];
-	}
-	if(sum != buf[len - 1]) return;
-	
-	
-	
-	
-	if(len == 10)//¿ªÊ¼ ("START")+(4×Ö½ÚµØÖ·)+(1×Ö½ÚĞ£Ñé) = 10
-	{
-		if(buf[0]!='S') return;
-		if(buf[1]!='T') return;
-		if(buf[2]!='A') return;
-		if(buf[3]!='R') return;
-		if(buf[4]!='T') return;
-		
-		// ÎÄ¼ş´óĞ¡
-		file_size = (buf[5]<<24) + (buf[6]<<16) + (buf[7]<<8) + (buf[8]);
-		if(file_size>Application_Size) return;
 
-		// ²Á³ı
-		Erase_page(Application_1_Addr, Application_Size/PageSize);
-		Read_Flag = 1;
-		printf("\n> Status:%d\r\n> Ready to receive file\r\n",file_size);
-	}	
-	else if(len == 4)//½áÊø ("END")+(1×Ö½ÚĞ£Ñé) = 4
-	{
-		if(buf[0]!='E') return;
-		if(buf[1]!='N') return;
-		if(buf[2]!='D') return;
-		
-		
-		// Éı¼¶Ê§°Ü - ¸´Î»
-		printf("> File fail!, restart...\r\n");
-		HAL_NVIC_SystemReset();
-	}
-	else if(len==(138))//Êı¾İÎÄ¼ş ("DATA")+(4×Ö½ÚµØÖ·)+(1×Ö½Ú´óĞ¡)+(128×Ö½ÚÊı¾İ)+(1×Ö½ÚĞ£Ñé) = 137
-	{
-		if(buf[0]!='D') return;
-		if(buf[1]!='A') return;
-		if(buf[2]!='T') return;
-		if(buf[3]!='A') return;
-		
-		unsigned int addr = (buf[4]<<24) + (buf[5]<<16) + (buf[6]<<8) + (buf[7]); 
-		if(addr_now != addr) return;
-		
-		if(buf[8]!=128) return;
-		
-		/* Êı¾İÕıÈ·:ÉÕÂ¼ */
-		WriteFlash((Application_1_Addr + addr_now), (unsigned int *)(&buf[9]), 32);		
-		printf("> File data:%d/%d\r\n",addr_now,file_size);
-		
-		// ĞŞ¸ÄÉÕÂ¼Î»ÖÃ
-		addr_now += 128;
-		
-		if(addr_now >= file_size)//ÉÕÂ¼Íê³É
-		{
-			//³É¹¦
-			Get_File_Ok();
-			Set_Start_Mode(Startup_Normol);
-			printf("> File ok!, restart...\r\n");
-			HAL_NVIC_SystemReset();
-		}
-	}
+    if ( len == 10 )  // å¼€å§‹ ("START")+(4å­—èŠ‚åœ°å€)+(1å­—èŠ‚æ ¡éªŒ) = 10
+    {
+        if ( buf[ 0 ] != 'S' )
+            return;
+        if ( buf[ 1 ] != 'T' )
+            return;
+        if ( buf[ 2 ] != 'A' )
+            return;
+        if ( buf[ 3 ] != 'R' )
+            return;
+        if ( buf[ 4 ] != 'T' )
+            return;
+
+        // æ–‡ä»¶å¤§å°
+        file_size = ( buf[ 5 ] << 24 ) + ( buf[ 6 ] << 16 ) + ( buf[ 7 ] << 8 ) + ( buf[ 8 ] );
+        if ( file_size > Application_Size )
+            return;
+
+        // æ“¦é™¤
+        Erase_page( Application_1_Addr, Application_Size / PageSize );
+        Read_Flag = 1;
+        printf( "\n> Status:%d\r\n> Ready to receive file\r\n", file_size );
+    }
+    else if ( len == 4 )  // ç»“æŸ ("END")+(1å­—èŠ‚æ ¡éªŒ) = 4
+    {
+        if ( buf[ 0 ] != 'E' )
+            return;
+        if ( buf[ 1 ] != 'N' )
+            return;
+        if ( buf[ 2 ] != 'D' )
+            return;
+
+
+        // å‡çº§å¤±è´¥ - å¤ä½
+        printf( "> File fail!, restart...\r\n" );
+        HAL_NVIC_SystemReset();
+    }
+    else if ( len == ( 138 ) )  // æ•°æ®æ–‡ä»¶ ("DATA")+(4å­—èŠ‚åœ°å€)+(1å­—èŠ‚å¤§å°)+(128å­—èŠ‚æ•°æ®)+(1å­—èŠ‚æ ¡éªŒ) = 137
+    {
+        if ( buf[ 0 ] != 'D' )
+            return;
+        if ( buf[ 1 ] != 'A' )
+            return;
+        if ( buf[ 2 ] != 'T' )
+            return;
+        if ( buf[ 3 ] != 'A' )
+            return;
+
+        unsigned int addr = ( buf[ 4 ] << 24 ) + ( buf[ 5 ] << 16 ) + ( buf[ 6 ] << 8 ) + ( buf[ 7 ] );
+        if ( addr_now != addr )
+            return;
+
+        if ( buf[ 8 ] != 128 )
+            return;
+
+        /* æ•°æ®æ­£ç¡®:çƒ§å½• */
+        WriteFlash( ( Application_1_Addr + addr_now ), ( unsigned int* )( &buf[ 9 ] ), 32 );
+        printf( "> File data:%d/%d\r\n", addr_now, file_size );
+
+        // ä¿®æ”¹çƒ§å½•ä½ç½®
+        addr_now += 128;
+
+        if ( addr_now >= file_size )  // çƒ§å½•å®Œæˆ
+        {
+            // æˆåŠŸ
+            Get_File_Ok();
+            Set_Start_Mode( Startup_Normol );
+            printf( "> File ok!, restart...\r\n" );
+            HAL_NVIC_SystemReset();
+        }
+    }
 }
-
 
 
 /**
- * @bieaf  »ñÈ¡Éı¼¶ÎÄ¼şµÄº¯Êı
- * @detail ÔÚ×Ô¼ìÊ±¼äÄÚÊÕµ½Éı¼¶ÃüÁî¾Í³ÌĞòÉı¼¶
+ * @bieaf  è·å–å‡çº§æ–‡ä»¶çš„å‡½æ•°
+ * @detail åœ¨è‡ªæ£€æ—¶é—´å†…æ”¶åˆ°å‡çº§å‘½ä»¤å°±ç¨‹åºå‡çº§
  *
- * @param  int time_ms,×Ô¼ìÊ±¼ä
+ * @param  int time_ms,è‡ªæ£€æ—¶é—´
  */
-void Get_OTA_File(unsigned int time_ms)
-{
-	Waite_time = time_ms;
-	
-	printf("> Wait %dms...\r\n",time_ms);
-	
-	while(1)
-	{
-		if(Rx_Flag == 1)//ÊÕµ½Ò»Ö¡Êı¾İ
-		{
-			Rx_Flag = 0;			
-			Leaf_Deal_Frame(Rx_Buf, Rx_Len);
-		}
-		
-		/* ·¢ËÍÃüÁî°ü */
-		if(Read_Flag == 1)
-		{
-			Get_File(addr_now,128);
-			HAL_Delay(10);
-		}
-		else if(Waite_time > 0)
-		{
-			Waite_time = Waite_time - 100;
-			HAL_Delay(100);
-		}
-		else
-		{
-			return;
-		}
-	}
+void Get_OTA_File( unsigned int time_ms ) {
+    Waite_time = time_ms;
+
+    printf( "> Wait %dms...\r\n", time_ms );
+
+    while ( 1 ) {
+        if ( Rx_Flag == 1 )  // æ”¶åˆ°ä¸€å¸§æ•°æ®
+        {
+            Rx_Flag = 0;
+            Leaf_Deal_Frame( Rx_Buf, Rx_Len );
+        }
+
+        /* å‘é€å‘½ä»¤åŒ… */
+        if ( Read_Flag == 1 ) {
+            Get_File( addr_now, 128 );
+            HAL_Delay( 10 );
+        }
+        else if ( Waite_time > 0 ) {
+            Waite_time = Waite_time - 100;
+            HAL_Delay( 100 );
+        }
+        else {
+            return;
+        }
+    }
 }
 
 
-
-/* ²ÉÓÃ»ã±àÉèÖÃÕ»µÄÖµ */
-__asm void MSR_MSP (unsigned int ulAddr) 
-{
-    MSR MSP, r0 			                   //set Main Stack value
-    BX r14
+/* é‡‡ç”¨æ±‡ç¼–è®¾ç½®æ ˆçš„å€¼ */
+__asm void MSR_MSP( unsigned int ulAddr ) {
+    MSR          MSP, r0  // set Main Stack value
+                 BX r14
 }
 
 
+/* ç¨‹åºè·³è½¬å‡½æ•° */
+typedef void ( *Jump_Fun )( void );
+void IAP_ExecuteApp( unsigned int App_Addr ) {
+    Jump_Fun JumpToApp;
 
-/* ³ÌĞòÌø×ªº¯Êı */
-typedef void (*Jump_Fun)(void);
-void IAP_ExecuteApp (unsigned int App_Addr)
-{
-	Jump_Fun JumpToApp; 
-    
-	if ( ( ( * ( __IO unsigned int * ) App_Addr ) & 0x2FFE0000 ) == 0x20000000 )	//¼ì²éÕ»¶¥µØÖ·ÊÇ·ñºÏ·¨.
-	{ 
-		JumpToApp = (Jump_Fun) * ( __IO unsigned int *)(App_Addr + 4);				//ÓÃ»§´úÂëÇøµÚ¶ş¸ö×ÖÎª³ÌĞò¿ªÊ¼µØÖ·(¸´Î»µØÖ·)		
-		MSR_MSP( * ( __IO unsigned int * ) App_Addr );								//³õÊ¼»¯APP¶ÑÕ»Ö¸Õë(ÓÃ»§´úÂëÇøµÄµÚÒ»¸ö×ÖÓÃÓÚ´æ·ÅÕ»¶¥µØÖ·)
-		JumpToApp();															//Ìø×ªµ½APP.
-	}
+    if ( ( ( *( __IO unsigned int* )App_Addr ) & 0x2FFE0000 ) == 0x20000000 )  // æ£€æŸ¥æ ˆé¡¶åœ°å€æ˜¯å¦åˆæ³•.
+    {
+        JumpToApp = ( Jump_Fun ) * ( __IO unsigned int* )( App_Addr + 4 );  // ç”¨æˆ·ä»£ç åŒºç¬¬äºŒä¸ªå­—ä¸ºç¨‹åºå¼€å§‹åœ°å€(å¤ä½åœ°å€)
+        MSR_MSP( *( __IO unsigned int* )App_Addr );                         // åˆå§‹åŒ–APPå †æ ˆæŒ‡é’ˆ(ç”¨æˆ·ä»£ç åŒºçš„ç¬¬ä¸€ä¸ªå­—ç”¨äºå­˜æ”¾æ ˆé¡¶åœ°å€)
+        JumpToApp();                                                        // è·³è½¬åˆ°APP.
+    }
 }
 
 
+/* è¿›è¡ŒBootLoaderçš„å¯åŠ¨ */
+void Start_BootLoader( void ) {
+    /*==========æ‰“å°æ¶ˆæ¯==========*/
+    //	 printf("\r\n");
+    //	 printf("******************************************\r\n");
+    //	 printf("*                                        *\r\n");
+    //	 printf("*    *****     ****     ****   *******   *\r\n");
+    //	 printf("*    *   **   *    *   *    *     *      *\r\n");
+    //	 printf("*    *    *   *    *   *    *     *      *\r\n");
+    //	 printf("*    *   **   *    *   *    *     *      *\r\n");
+    //	 printf("*    *****    *    *   *    *     *      *\r\n");
+    //	 printf("*    *   **   *    *   *    *     *      *\r\n");
+    //	 printf("*    *    *   *    *   *    *     *      *\r\n");
+    //	 printf("*    *   **   *    *   *    *     *      *\r\n");
+    //	 printf("*    *****     ****    ****       *      *\r\n");
+    //	 printf("*                                        *\r\n");
+    //	 printf("************************ by Leaf_Fruit ***\r\n");
+
+    printf( "\r\n" );
+    printf( "***********************************\r\n" );
+    printf( "*                                 *\r\n" );
+    printf( "*           BootLoader            *\r\n" );
+    printf( "*                                 *\r\n" );
+    printf( "***************** by Leaf_Fruit ***\r\n" );
 
 
-/* ½øĞĞBootLoaderµÄÆô¶¯ */
-void Start_BootLoader(void)
-{
-	/*==========´òÓ¡ÏûÏ¢==========*/  
-//	 printf("\r\n");
-//	 printf("******************************************\r\n");
-//	 printf("*                                        *\r\n");
-//	 printf("*    *****     ****     ****   *******   *\r\n");
-//	 printf("*    *   **   *    *   *    *     *      *\r\n");
-//	 printf("*    *    *   *    *   *    *     *      *\r\n");
-//	 printf("*    *   **   *    *   *    *     *      *\r\n");
-//	 printf("*    *****    *    *   *    *     *      *\r\n");
-//	 printf("*    *   **   *    *   *    *     *      *\r\n");
-//	 printf("*    *    *   *    *   *    *     *      *\r\n");
-//	 printf("*    *   **   *    *   *    *     *      *\r\n");
-//	 printf("*    *****     ****    ****       *      *\r\n");
-//	 printf("*                                        *\r\n");
-//	 printf("************************ by Leaf_Fruit ***\r\n");
-	
-	 printf("\r\n");
-	 printf("***********************************\r\n");
-	 printf("*                                 *\r\n");
-	 printf("*           BootLoader            *\r\n");
-	 printf("*                                 *\r\n");
-	 printf("***************** by Leaf_Fruit ***\r\n");
-	
-	
-	
-	Get_OTA_File(1000);	/* ×Ô¼ì2Ãë */
-	
-	printf("> Choose a startup method......\r\n");	
-	switch(Read_Start_Mode())										///< ¶ÁÈ¡ÊÇ·ñÆô¶¯Ó¦ÓÃ³ÌĞò */
-	{
-		case Startup_Normol:										///< Õı³£Æô¶¯ */
-		{
-			printf("> Normal start......\r\n");
-			break;
-		}
-		case Startup_Update:										///< Éı¼¶ÔÙÆô¶¯ */
-		{
-			printf("> Start update......\r\n");		
-			MoveCode(Application_2_Addr, Application_1_Addr, Application_Size);
-			printf("> Update down......\r\n");
-			break;
-		}
-		case Startup_OtaNow:										///< ÏÖÔÚ¾ÍÉı¼¶
-		{
-			printf("> OTA now......\r\n");
-			Get_OTA_File(20000);
-			break;			
-		}
-		case Startup_Reset:											///< »Ö¸´³ö³§ÉèÖÃ Ä¿Ç°Ã»Ê¹ÓÃ */
-		{
-			printf("> Restore to factory program......\r\n");
-			break;			
-		}
-		default:													///< Æô¶¯Ê§°Ü
-		{
-			printf("> Error:%X!!!......\r\n", Read_Start_Mode());
-			return;			
-		}
-	}
-	
-	/* Ìø×ªµ½Ó¦ÓÃ³ÌĞò */
-	printf("> Start up......\r\n\r\n");	
-	IAP_ExecuteApp(Application_1_Addr);
+    Get_OTA_File( 1000 ); /* è‡ªæ£€2ç§’ */
+
+    printf( "> Choose a startup method......\r\n" );
+    switch ( Read_Start_Mode() )  ///< è¯»å–æ˜¯å¦å¯åŠ¨åº”ç”¨ç¨‹åº */
+    {
+    case Startup_Normol:  ///< æ­£å¸¸å¯åŠ¨ */
+    {
+        printf( "> Normal start......\r\n" );
+        break;
+    }
+    case Startup_Update:  ///< å‡çº§å†å¯åŠ¨ */
+    {
+        printf( "> Start update......\r\n" );
+        MoveCode( Application_2_Addr, Application_1_Addr, Application_Size );
+        printf( "> Update down......\r\n" );
+        break;
+    }
+    case Startup_OtaNow:  ///< ç°åœ¨å°±å‡çº§
+    {
+        printf( "> OTA now......\r\n" );
+        Get_OTA_File( 20000 );
+        break;
+    }
+    case Startup_Reset:  ///< æ¢å¤å‡ºå‚è®¾ç½® ç›®å‰æ²¡ä½¿ç”¨ */
+    {
+        printf( "> Restore to factory program......\r\n" );
+        break;
+    }
+    default:  ///< å¯åŠ¨å¤±è´¥
+    {
+        printf( "> Error:%X!!!......\r\n", Read_Start_Mode() );
+        return;
+    }
+    }
+
+    /* è·³è½¬åˆ°åº”ç”¨ç¨‹åº */
+    printf( "> Start up......\r\n\r\n" );
+    IAP_ExecuteApp( Application_1_Addr );
 }
-
-
-
-

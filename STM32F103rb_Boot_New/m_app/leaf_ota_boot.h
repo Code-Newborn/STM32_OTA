@@ -2,37 +2,33 @@
 #define _LEAF_OTA_BOOT_H_
 
 
+/*=====ç”¨æˆ·é…ç½®(æ ¹æ®è‡ªå·±çš„åˆ†åŒºè¿›è¡Œé…ç½®)=====*/
 
-/*=====ÓÃ»§ÅäÖÃ(¸ù¾İ×Ô¼ºµÄ·ÖÇø½øĞĞÅäÖÃ)=====*/
+#define PageSize FLASH_PAGE_SIZE  // 1K
 
-#define PageSize		FLASH_PAGE_SIZE			//1K
+#define BootLoader_addr    0x08000000U  ///< BootLoaderçš„é¦–åœ°å€
+#define Application_1_Addr 0x08005000U  ///< åº”ç”¨ç¨‹åº1çš„é¦–åœ°å€
+#define Application_2_Addr 0x0800F000U  ///< åº”ç”¨ç¨‹åº2çš„é¦–åœ°å€
 
-#define BootLoader_addr			0x08000000U		///< BootLoaderµÄÊ×µØÖ·
-#define Application_1_Addr		0x08005000U		///< Ó¦ÓÃ³ÌĞò1µÄÊ×µØÖ·
-#define Application_2_Addr		0x0800F000U		///< Ó¦ÓÃ³ÌĞò2µÄÊ×µØÖ·
-
-#define BootLoader_Size 		0x5000U			///< BootLoaderµÄ´óĞ¡ 20K
-#define Application_Size		0xA000U			///< Ó¦ÓÃ³ÌĞòµÄ´óĞ¡ 40K
+#define BootLoader_Size  0x5000U  ///< BootLoaderçš„å¤§å° 20K
+#define Application_Size 0xA000U  ///< åº”ç”¨ç¨‹åºçš„å¤§å° 40K
 
 
-/* Æô¶¯µÄ²½Öè */
-#define Startup_Normol 0xFFFFFFFF	///< Õı³£Æô¶¯
-#define Startup_Update 0xAAAAAAAA	///< Éı¼¶ÔÙÆô¶¯
-#define Startup_OtaNow 0x55555555	///< ÏÖÔÚÉı¼¶
-#define Startup_Reset  0x5555AAAA	///< ***»Ö¸´³ö³§ Ä¿Ç°Ã»Ê¹ÓÃ***
+/* å¯åŠ¨çš„æ­¥éª¤ */
+#define Startup_Normol 0xFFFFFFFF  ///< æ­£å¸¸å¯åŠ¨
+#define Startup_Update 0xAAAAAAAA  ///< å‡çº§å†å¯åŠ¨
+#define Startup_OtaNow 0x55555555  ///< ç°åœ¨å‡çº§
+#define Startup_Reset  0x5555AAAA  ///< ***æ¢å¤å‡ºå‚ ç›®å‰æ²¡ä½¿ç”¨***
 
 /*==========================================*/
 
 
+int  Erase_page( unsigned int pageaddr, unsigned int num );
+void WriteFlash( unsigned int addr, unsigned int* buff, int word_size );
 
+void Leaf_Uart2_Send( unsigned char* buf, int len );
+void Leaf_Deal_Frame( unsigned char* buf, int len );
 
-int  Erase_page(unsigned int pageaddr, unsigned int num);
-void WriteFlash(unsigned int addr, unsigned int * buff, int word_size);
-
-void Leaf_Uart2_Send(unsigned char * buf, int len);
-void Leaf_Deal_Frame(unsigned char * buf, int len);
-
-void Start_BootLoader(void);
+void Start_BootLoader( void );
 
 #endif
-

@@ -1,0 +1,120 @@
+
+=================================================== keil-build-viewer v1.5b ==================================================
+ 
+[Search keil project] 1 item(s)
+	F:\Github\STM32_OTA\STM32F103rb_Boot_New\MDK-ARM\STM32F103rb_bootloader.uvprojx
+
+[User input] 
+[Current folder] F:\Github\STM32_OTA\STM32F103rb_Boot_New\MDK-ARM
+[Encoding] 936
+[Keil project path] F:\Github\STM32_OTA\STM32F103rb_Boot_New\MDK-ARM\STM32F103rb_bootloader.uvprojx
+[Keil project name] STM32F103rb_bootloader.uvprojx
+[Is keil v4] 0
+[target name] STM32F103rb_bootloader
+[final target name] STM32F103rb_bootloader
+
+[Device] STM32F103RB
+[Target name] 
+[Output name] STM32F103rb_bootloader
+[Output path] .\STM32F103rb_bootloader\
+[Listing path] .\Listing\
+[Is has pack] 1
+[Is enbale LTO] 0
+[Is has user library] 0
+[Is custom scatter file] 0
+
+[STM32F103rb_bootloader.uvprojx]  [STM32F103rb_bootloader]  [STM32F103RB]
+ 
+[memory info]
+[name] IRAM [base addr] 0x20000000 [size] 0x00005000 [type] 1 [off-chip] 0 [is pack] 1 [ID] 2 
+[name] IROM [base addr] 0x08000000 [size] 0x00020000 [type] 2 [off-chip] 0 [is pack] 1 [ID] 3 
+
+
+[map file path] F:\Github\STM32_OTA\STM32F103rb_Boot_New\MDK-ARM\Listing\STM32F103rb_bootloader.map
+
+[region info]
+[load region] LR_IROM1
+	[execution region] ER_IROM1, 0x08000000, 0x00005000, 0x00002324 [memory type] 2 [memory ID] 3
+
+	[execution region] RW_IRAM1, 0x20000000, 0x00005000, 0x00000920 [memory type] 1 [memory ID] 2
+		[ZI block] addr: 0x2000002C, size: 0x000008F4 (2292)
+
+
+[object name max length] 24
+[object path max length] 60
+
+[object in map file]
+[object name] leaf_ota_boot.o           [path] ..\m_app\leaf_ota_boot.c
+[object name] main.o                    [path] ../Src/main.c
+[object name] startup_stm32f103xb.o     [path] startup_stm32f103xb.s
+[object name] stm32f1xx_hal.o           [path] ../Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal.c
+[object name] stm32f1xx_hal_cortex.o    [path] ../Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_cortex.c
+[object name] stm32f1xx_hal_dma.o       [path] ../Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_dma.c
+[object name] stm32f1xx_hal_flash.o     [path] ../Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_flash.c
+[object name] stm32f1xx_hal_flash_ex.o  [path] ../Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_flash_ex.c
+[object name] stm32f1xx_hal_gpio.o      [path] ../Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_gpio.c
+[object name] stm32f1xx_hal_msp.o       [path] ../Src/stm32f1xx_hal_msp.c
+[object name] stm32f1xx_hal_rcc.o       [path] ../Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_rcc.c
+[object name] stm32f1xx_hal_uart.o      [path] ../Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_uart.c
+[object name] stm32f1xx_it.o            [path] ../Src/stm32f1xx_it.c
+[object name] system_stm32f1xx.o        [path] ../Src/system_stm32f1xx.c
+
+[file path in keil project]
+[old name] startup_stm32f103xb.s     [type] 1   [path] startup_stm32f103xb.s
+[old name] main.c                    [type] 1   [path] ../Src/main.c
+[old name] stm32f1xx_it.c            [type] 1   [path] ../Src/stm32f1xx_it.c
+[old name] stm32f1xx_hal_msp.c       [type] 1   [path] ../Src/stm32f1xx_hal_msp.c
+[old name] stm32f1xx_hal_gpio_ex.c   [type] 1   [path] ../Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_gpio_ex.c
+[old name] stm32f1xx_hal_tim.c       [type] 1   [path] ../Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_tim.c
+[old name] stm32f1xx_hal_tim_ex.c    [type] 1   [path] ../Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_tim_ex.c
+[old name] stm32f1xx_hal_uart.c      [type] 1   [path] ../Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_uart.c
+[old name] stm32f1xx_hal.c           [type] 1   [path] ../Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal.c
+[old name] stm32f1xx_hal_rcc.c       [type] 1   [path] ../Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_rcc.c
+[old name] stm32f1xx_hal_rcc_ex.c    [type] 1   [path] ../Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_rcc_ex.c
+[old name] stm32f1xx_hal_gpio.c      [type] 1   [path] ../Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_gpio.c
+[old name] stm32f1xx_hal_dma.c       [type] 1   [path] ../Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_dma.c
+[old name] stm32f1xx_hal_cortex.c    [type] 1   [path] ../Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_cortex.c
+[old name] stm32f1xx_hal_pwr.c       [type] 1   [path] ../Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_pwr.c
+[old name] stm32f1xx_hal_flash.c     [type] 1   [path] ../Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_flash.c
+[old name] stm32f1xx_hal_flash_ex.c  [type] 1   [path] ../Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_flash_ex.c
+[old name] stm32f1xx_hal_exti.c      [type] 1   [path] ../Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_exti.c
+[old name] system_stm32f1xx.c        [type] 1   [path] ../Src/system_stm32f1xx.c
+[old name] leaf_ota_boot.c           [type] 1   [path] ..\m_app\leaf_ota_boot.c
+
+[record region info]
+[load region] LR_IROM1
+	[execution region] ER_IROM1, 0x08000000, 0x00005000, 0x00002324 [type] 2 [ID] 3
+	[execution region] RW_IRAM1, 0x20000000, 0x00010000, 0x00000920 [type] 1 [ID] 2
+------------------------------------------------------------------------------------------------------------------------
+                             FILE(s)                             |         RAM (byte)       |       FLASH (byte)       |
+------------------------------------------------------------------------------------------------------------------------
+..\m_app\leaf_ota_boot.c():                                      |          30              |        1716              |
+../Src/main.c():                                                 |        1223              |         291              |
+startup_stm32f103xb.s():                                         |        1024              |         272              |
+../Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal.c():           |          12              |         176              |
+../Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_cortex.c():    |           0              |         234              |
+../Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_dma.c():       |           0              |         808              |
+../Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_flash.c():     |          32              |         392              |
+../Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_flash_ex.c():  |           0              |         240              |
+../Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_gpio.c():      |           0              |         480              |
+../Src/stm32f1xx_hal_msp.c():                                    |           0              |         312              |
+../Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_rcc.c():       |           0              |        1272              |
+../Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_uart.c():      |           0              |        1542              |
+../Src/stm32f1xx_it.c():                                         |           0              |         116              |
+../Src/system_stm32f1xx.c():                                     |           4              |         100              |
+------------------------------------------------------------------------------------------------------------------------
+[memory print mode]: 0
+LR_IROM1
+        RAM 1             [0x20000000 | 0x00005000 (20480)]
+                [zi start] 1   [zi end] 5
+                RW_IRAM1  [0x20000000]|¡ö¡õ¡õ¡õ¡õ_____________________________________________| (   2.2 KB /  20.0 KB )  11.4%  
+ 
+        FLASH 1           [0x08000000 | 0x00020000 (131072)]
+                ER_IROM1  [0x08000000]|¡ö¡ö¡ö¡ö¡ö¡ö¡ö¡ö¡ö¡ö¡ö¡ö¡ö¡ö¡ö¡ö¡ö¡ö¡ö¡ö¡ö_____________________________| (   8.7 KB /  20.0 KB )  43.9%  
+ 
+[htm file path] F:\Github\STM32_OTA\STM32F103rb_Boot_New\MDK-ARM\STM32F103rb_bootloader\STM32F103rb_bootloader.htm
+Maximum Stack Usage =       1152 bytes + Unknown(Cycles, Untraceable Function Pointers)
+ 
+=============================================================================================================================
+
+run time: 0.041 s
